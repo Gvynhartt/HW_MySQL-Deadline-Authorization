@@ -1,6 +1,7 @@
 package ru.netology.pages;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Selenide;
 import ru.netology.data.MsDataHelper;
 import ru.netology.data.VerificationCode;
 
@@ -25,5 +26,16 @@ public class AuthCodePage {
 
     public void notifyAboutInvalidCode() {
         $x("//div[@data-test-id='error-notification']").shouldHave(Condition.text("Ошибка! Неверно указан код! Попробуйте ещё раз."));
+    }
+
+    public LoginPage backToLoginPage() {
+        Selenide.back();
+        return new LoginPage();
+    }
+
+    public LoginPage notifyAboutCodeEntryLimit() {
+        $x("//div[@data-test-id='error-notification']/descendant::div[@class='notification__content']")
+                .shouldHave(Condition.text("Ошибка! Превышено количество попыток ввода кода!"));
+        return new LoginPage();
     }
 }

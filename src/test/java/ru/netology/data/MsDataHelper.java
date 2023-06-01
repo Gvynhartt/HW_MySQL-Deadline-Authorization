@@ -12,12 +12,6 @@ import java.util.Locale;
 
 public class MsDataHelper {
 
-    @Value
-    public static class UserEntry {
-        private String defUserLogin;
-        private String defUserPassword;
-    }
-
     public static UserEntry generateDefaultVasya() {
         UserEntry defaultVasya = new UserEntry("vasya", "qwerty123");
         return defaultVasya;

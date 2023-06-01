@@ -1,20 +1,25 @@
 package ru.netology.pages;
 
 import com.codeborne.selenide.Condition;
-import ru.netology.data.MsDataHelper;
+import org.openqa.selenium.Keys;
+import ru.netology.data.UserEntry;
 
 import static com.codeborne.selenide.Selenide.$x;
 
 public class LoginPage {
 
-    public void enterLogin(MsDataHelper.UserEntry someUser) { // параметр нужен, т.к. мы хотим вставлять разных пользователей #svobodavybora
+    public void enterLogin(UserEntry someUser) { // параметр нужен, т.к. мы хотим вставлять разных пользователей #svobodavybora
         $x("//span[@data-test-id='login']/descendant::input[@name='login']").
                 setValue(someUser.getDefUserLogin());
     }
 
-    public void enterPassword(MsDataHelper.UserEntry someUser) { // параметр нужен, т.к. мы хотим вставлять разных пользователей #svobodavybora
+    public void enterPassword(UserEntry someUser) { // параметр нужен, т.к. мы хотим вставлять разных пользователей #svobodavybora
         $x("//span[@data-test-id='password']/descendant::input[@name='password']").
                 setValue(someUser.getDefUserPassword());
+    }
+
+    public void clearPasswordField() {
+        $x("//span[@data-test-id='password']/descendant::input[@name='password']").sendKeys(Keys.chord(Keys.CONTROL, Keys.BACK_SPACE));
     }
 
     public AuthCodePage pressContinue() {

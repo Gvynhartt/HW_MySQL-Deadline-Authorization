@@ -1,9 +1,9 @@
 package tests;
 
 import com.codeborne.selenide.Configuration;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import ru.netology.data.MsDataHelper;
+import ru.netology.data.UserEntry;
 import ru.netology.pages.AuthCodePage;
 import ru.netology.pages.CardsNotFoundPage;
 import ru.netology.pages.LoginPage;
@@ -12,13 +12,18 @@ import static com.codeborne.selenide.Selenide.open;
 
 public class LoginTests {
 
+    @AfterAll
+    public static void shdClearData() {
+        MsDataHelper.cleanDataInDBafterLogin();
+    }
+
     @Test
     @DisplayName("Login with data for Vasya (valid)")
     public void shdLoginAsVasyaNormal() {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999");
 
-        MsDataHelper.UserEntry dzaVasya = MsDataHelper.generateDefaultVasya();
+        UserEntry dzaVasya = MsDataHelper.generateDefaultVasya();
 
         LoginPage loginPage = new LoginPage();
         loginPage.enterLogin(dzaVasya);
@@ -37,7 +42,7 @@ public class LoginTests {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999");
 
-        MsDataHelper.UserEntry dzaPetya = MsDataHelper.generateDefaultPetya();
+        UserEntry dzaPetya = MsDataHelper.generateDefaultPetya();
 
         LoginPage loginPage = new LoginPage();
         loginPage.enterLogin(dzaPetya);
@@ -56,7 +61,7 @@ public class LoginTests {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999");
 
-        MsDataHelper.UserEntry averageJoe = MsDataHelper.generateUserWithRandomCredentials();
+        UserEntry averageJoe = MsDataHelper.generateUserWithRandomCredentials();
 
         LoginPage loginPage = new LoginPage();
         loginPage.enterLogin(averageJoe);
@@ -71,7 +76,7 @@ public class LoginTests {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999");
 
-        MsDataHelper.UserEntry dzaPetya = MsDataHelper.generateDefaultPetya();
+        UserEntry dzaPetya = MsDataHelper.generateDefaultPetya();
 
         LoginPage loginPage = new LoginPage();
         loginPage.enterLogin(dzaPetya);
@@ -89,25 +94,44 @@ public class LoginTests {
         Configuration.holdBrowserOpen = true;
         open("http://localhost:9999");
 
-        MsDataHelper.UserEntry dzaVasya = MsDataHelper.generateDefaultVasya();
-        MsDataHelper.UserEntry someRando = MsDataHelper.generateUserWithRandomCredentials();
+        UserEntry dzaVasya = MsDataHelper.generateDefaultVasya();
 
         LoginPage loginPage = new LoginPage();
         loginPage.enterLogin(dzaVasya);
-        loginPage.enterPassword(someRando);
-        loginPage.enterPassword(someRando);
-        loginPage.enterPassword(someRando);
+        loginPage.enterPassword(dzaVasya);
         loginPage.pressContinue();
-        loginPage.notifyAboutInvalidCredentials();
+        AuthCodePage authCodePage = new AuthCodePage();
+        authCodePage.enterRandomAuthCode();
+        authCodePage.pressSubmit();
+        authCodePage.notifyAboutInvalidCode();
+        authCodePage.backToLoginPage(); // цикл раз
 
-        /** "P.S. Неплохо бы ещё проверить, что при трёхкратном неверном вводе пароля система блокируется" -
-         * оно, может, и неплохо, однако неясно, что именно я должен тестировать, т. к. ноль пояснений на предмет
-         * что это за блокировка, в чём она выражается и как можно установить факт оной. Лично моя система блокируется
-         * от подобных формулировок задач. Это к вопросу о тестировании требований. */
+        loginPage.enterLogin(dzaVasya);
+        loginPage.enterPassword(dzaVasya);
+        loginPage.pressContinue();
+        authCodePage.enterRandomAuthCode();
+        authCodePage.pressSubmit();
+        authCodePage.notifyAboutInvalidCode();
+        authCodePage.backToLoginPage(); // цикл двас
+
+        loginPage.enterLogin(dzaVasya);
+        loginPage.enterPassword(dzaVasya);
+        loginPage.pressContinue();
+        authCodePage.enterRandomAuthCode();
+        authCodePage.pressSubmit();
+        authCodePage.notifyAboutInvalidCode();
+        authCodePage.backToLoginPage(); // цикл Трисс
+
+        loginPage.enterLogin(dzaVasya);
+        loginPage.enterPassword(dzaVasya);
+        loginPage.pressContinue();
+        authCodePage.enterRandomAuthCode();
+        authCodePage.pressSubmit();
+        authCodePage.notifyAboutCodeEntryLimit(); // кiнец
+
+        /** Как выяснилось, блокировка в SUT действительно есть, правда, почему-то при вводе кода, а не пароля,
+         * причём выяснил я это лишь когда стал запускать все тесты одной пачкой и случайно заметил, что на
+         * цатую итерацию уведомление поменялось.*/
     }
 
-    @Test
-    public void shdClearData() {
-        MsDataHelper.cleanDataInDBafterLogin();
-    } // строго говоря, тестировать удаление нет нужды, однако очистку данных откуда-то запускать надо
 }
